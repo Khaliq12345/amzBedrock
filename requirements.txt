@@ -3,3 +3,4 @@ streamlit-extras
 pandas
 dateparser
 openpyxl
+xlsxwriter
