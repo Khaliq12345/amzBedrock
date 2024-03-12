@@ -73,7 +73,9 @@ def login_app():
     password = st.text_input("Password", type="password")
     
     if st.button("Login"):
-        if sign_in_with_username_and_password(username, password):
+        with st.spinner('Signing in...'):
+            signed_in = sign_in_with_username_and_password(username, password)
+        if signed_in:
             st.success("Logged in as {}".format(username))
             st.session_state['access'] = True
             st.experimental_rerun()
