@@ -1,4 +1,6 @@
 streamlit
-streamlit_extras
+streamlit-extras
 pandas
 dateparser
+openpyxl
+xlsxwriter
