@@ -4,3 +4,5 @@ pandas
 dateparser
 openpyxl
 xlsxwriter
+firebase-admin
+requests

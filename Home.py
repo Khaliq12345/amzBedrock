@@ -1,11 +1,60 @@
 import streamlit as st
 from streamlit_extras.colored_header import colored_header
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import auth
+import json
+import requests
+from time import sleep
+
+rest_api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
+
+cred_json = {
+  "type": st.secrets['TYPE'],
+  "project_id": st.secrets['PROJECT_ID'],
+  "private_key_id": st.secrets['PRIVATE_KEY_ID'],
+  "private_key": st.secrets['PRIVATE_KEY'],
+  "client_email": st.secrets['CLIENT_EMAIL'],
+  "client_id": st.secrets['CLIENT_ID'],
+  "auth_uri": st.secrets['AUTH_URI'],
+  "token_uri": st.secrets['TOKEN_URI'],
+  "auth_provider_x509_cert_url": st.secrets['AUTH_PROVIDER'],
+  "client_x509_cert_url": st.secrets['CLIENT_URL'],
+  "universe_domain": st.secrets['UNIVERSE_DOMAIN']
+}
 
 if 'access' not in st.session_state:
     st.session_state['access'] = False
+if 'cred' not in st.session_state:
+    st.session_state['cred'] = credentials.Certificate(cred_json)
 
-admin = 'admin'
-pswd = 'admin'
+# admin = 'admin'
+# pswd = 'admin12345'
+
+def create_new_user(email, pswd, username):
+    firebase_admin.initialize_app(st.session_state['cred'])
+    auth.create_user(email=email, password=pswd, uid=username)
+    
+    try:
+        user_ = auth.get_user(uid=username)
+        return True
+    except auth.UserNotFoundError:
+        return False
+    
+def sign_in_with_username_and_password(username: str, password: str, return_secure_token: bool = True):
+    payload = json.dumps({
+        "email": f'{username}@gmail.com',
+        "password": password,
+        "returnSecureToken": return_secure_token
+    })
+
+    r = requests.post(rest_api_url,
+                      params={"key": st.secrets['FIREBASE_WEB_API_KEY']},
+                      data=payload)
+    if r.status_code == 200:
+      return True
+    else:
+      return False
 
 def login_app():
     st.set_page_config(
@@ -24,7 +73,7 @@ def login_app():
     password = st.text_input("Password", type="password")
     
     if st.button("Login"):
-        if username == admin and password == pswd:
+        if sign_in_with_username_and_password(username, password):
             st.success("Logged in as {}".format(username))
             st.session_state['access'] = True
             st.experimental_rerun()
