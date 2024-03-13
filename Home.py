@@ -78,7 +78,7 @@ def login_app():
         if signed_in:
             st.success("Logged in as {}".format(username))
             st.session_state['access'] = True
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid username or password")
 
@@ -102,7 +102,7 @@ def access_app():
 
     if st.button('Logout!'):
         st.session_state['access'] = False
-        st.experimental_rerun()
+        st.rerun()
 
 
 if st.session_state['access']:
