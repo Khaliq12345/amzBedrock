@@ -29,8 +29,8 @@ def module_1():
         data_file = st.file_uploader('Upload your excel data', type=['xlsx'])
         with st.expander('Look at what your Input data looks like'):
             if data_file is not None:
-                input_df = pd.read_excel(data_file).head()
-                st.table(input_df)
+                input_df = pd.read_excel(data_file)
+                st.table(input_df.head())
                 output_dataframe = module_one.proccess_df(input_df)
         st.form_submit_button('Start Processing')
 
