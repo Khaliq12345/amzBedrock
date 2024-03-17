@@ -93,7 +93,7 @@ def download_keywords(file_url):
         kws = [k.replace('\n', '') for k in kws]
     return kws
 
-def modify_table(x_table, kw_type, kws):
+def modify_table(row, x_table, kw_type, kws):
     #Generating the campaign name
     no_nan = lambda x: '' if type(x) != str else x
     single_kw = f"{row['SKU']}_SP_KW_{row['Match Type']}_{row['ASIN']}_{no_nan(row['Campaign Name Modifier'])}_{kws}"
@@ -197,12 +197,12 @@ def proccess_df(input_df: pd.DataFrame):
                 kws = download_keywords(row['Keyword Link'])
                 for kw in kws:
                     x_table = get_table(out_cols, row['Single/Group KWs'], kw)
-                    x_table = modify_table(x_table, 'Single', kw)
+                    x_table = modify_table(row, x_table, 'Single', kw)
                     dfs.append(x_table)
             else:
                 kws = download_keywords(row['Keyword Link'])
                 x_table = get_table(out_cols, row['Single/Group KWs'], kws)
-                x_table = modify_table(x_table, 'Group', kws)        
+                x_table = modify_table(row, x_table, 'Group', kws)        
                 dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs)
