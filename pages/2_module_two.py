@@ -27,7 +27,6 @@ def module_2():
 
     with st.form('form-1', border=True):
         data_file = st.file_uploader('Upload your excel data', type=['xlsx'])
-        keywords = st.file_uploader('Upload your keyword text file', type=['txt'])
         with st.expander('Look at what your Input data looks like'):
             if data_file is not None:
                 input_df = pd.read_excel(data_file).dropna(how='all')
