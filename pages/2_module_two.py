@@ -31,9 +31,8 @@ def module_2():
         with st.expander('Look at what your Input data looks like'):
             if data_file is not None:
                 input_df = pd.read_excel(data_file).dropna(how='all')
-                keywords = pd.read_csv(keywords, header=None)[0].to_list()
                 st.table(input_df.head())
-                output_dataframe = module_two.proccess_df(input_df, keywords)
+                output_dataframe = module_two.proccess_df(input_df)
         st.form_submit_button('Start Processing')
 
     if not output_dataframe.empty:
