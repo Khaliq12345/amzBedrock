@@ -1,6 +1,10 @@
 import pandas as pd
 import dateparser
 from datetime import datetime
+from warnings import filterwarnings
+
+
+filterwarnings('ignore')
 
 out_cols = ['Product',
  'Entity',
