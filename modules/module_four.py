@@ -78,7 +78,7 @@ def download_categories(file_url):
     df = pd.read_csv('target.csv', header=None)
     return df
 
-def process_df(input_df: pd.DataFrame):
+def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
     dfs = []
     input_df['Placement Top'] = input_df['Placement Top'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
