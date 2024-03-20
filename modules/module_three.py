@@ -140,9 +140,15 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
             #Product Targeting
             if row['Targeting'] == 'SELF':
-                targets = f'asin="{row["ASIN"]}"'
+                if row['Expanded?'] == 'y':
+                    targets = f'asin-expanded="{row["ASIN"]}"'
+                else:
+                    targets = f'asin="{row["ASIN"]}"'
             else:
-                targets = [f'asin-expanded="{t}"' for t in asins]
+                if row['Expanded?'] == 'y':
+                    targets = [f'asin-expanded="{t}"' for t in asins]
+                else:
+                    targets = [f'asin="{t}"' for t in asins]
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
             dfs.append(x_table)
     
