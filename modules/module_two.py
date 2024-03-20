@@ -96,8 +96,10 @@ def download_keywords(file_url):
 def modify_table(row, x_table, kw_type, kws):
     #Generating the campaign name
     no_nan = lambda x: '' if type(x) != str else x
-    single_kw = f"{row['SKU']}_SP_KW_{row['Match Type']}_{row['ASIN']}_{no_nan(row['Campaign Name Modifier'])}_{kws}"
-    kw_not_single = f"{row['SKU']}_SP_KW_{row['Match Type']}_{row['ASIN']}_{no_nan(row['Campaign Name Modifier'])}"
+    branded_or_name = lambda x: '_Branded_' if row['Branded Campaign?'] == 'y' else f'_{x}_'
+    campaign_name_mod = no_nan(row['Campaign Name Modifier'])
+    single_kw = f"{row['SKU']}_SP_KW_{row['Match Type']}_{row['ASIN']}{branded_or_name(campaign_name_mod)}{kws}"
+    kw_not_single = f"{row['SKU']}_SP_KW_{row['Match Type']}_{row['ASIN']}{branded_or_name(campaign_name_mod)}"
     make_campaign_name = lambda x: single_kw if 'Single' in x else kw_not_single #make campaign name
     campaign_name = make_campaign_name(row['Single/Group KWs'])
     
