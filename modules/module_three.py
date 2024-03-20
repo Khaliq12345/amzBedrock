@@ -152,7 +152,7 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
             dfs.append(x_table)
     
-    output_dataframe = pd.concat(dfs)
+    output_dataframe = pd.concat(dfs, ignore_index=True)
     return output_dataframe
 
 

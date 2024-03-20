@@ -207,6 +207,6 @@ def proccess_df(input_df: pd.DataFrame):
                 x_table = modify_table(row, x_table, 'Group', kws)        
                 dfs.append(x_table)
 
-    output_dataframe = pd.concat(dfs)
+    output_dataframe = pd.concat(dfs, ignore_index=True)
     return output_dataframe
 

@@ -109,9 +109,7 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
             dfs.append(x_table)
 
-    output_dataframe = pd.concat(dfs)
-    #file_location = f'output_{str(datetime.now())}.xlsx'.replace(':', '_').replace(' ', '_').replace('.', '_')
-    #output_dataframe.to_excel(file_location, index=False)
+    output_dataframe = pd.concat(dfs, ignore_index=True)
     return output_dataframe
 
 
