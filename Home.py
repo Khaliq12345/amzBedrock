@@ -6,6 +6,7 @@ from firebase_admin import auth
 import json
 import requests
 from time import sleep
+from datetime import datetime
 
 rest_api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
 
@@ -29,6 +30,13 @@ if 'cred' not in st.session_state:
     st.session_state['cred'] = credentials.Certificate(cred_json)
 if 'username' not in st.session_state:
     st.session_state['username'] = None
+if 'date' not in st.session_state:
+    add_zero_if_one = lambda x: f'0{x}' if len(x) == 1 else x
+    date_obj = datetime.now()
+    year = add_zero_if_one(str(date_obj.year))
+    month = add_zero_if_one(str(date_obj.month))
+    day = add_zero_if_one(str(date_obj.day))
+    st.session_state['date'] = f'{day}_{month}_{year}'
 
 # admin = 'admin'
 # pswd = 'admin12345'
