@@ -46,6 +46,7 @@ def module_4():
             file_name="output.xlsx",
             mime="application/vnd.ms-excel"
         )
+        st.write(st.session_state['username'])
 
 if st.session_state['access']:
     module_4()

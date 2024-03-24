@@ -27,6 +27,8 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 if 'cred' not in st.session_state:
     st.session_state['cred'] = credentials.Certificate(cred_json)
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
 
 # admin = 'admin'
 # pswd = 'admin12345'
@@ -69,14 +71,14 @@ def login_app():
         color_name= 'blue-green-70'
     )
     
-    username = st.text_input("Username")
+    st.session_state['username'] = st.text_input("Username")
     password = st.text_input("Password", type="password")
     
     if st.button("Login"):
         with st.spinner('Signing in...'):
-            signed_in = sign_in_with_username_and_password(username, password)
+            signed_in = sign_in_with_username_and_password(st.session_state['username'], password)
         if signed_in:
-            st.success("Logged in as {}".format(username))
+            st.success("Logged in as {}".format(st.session_state['username']))
             st.session_state['access'] = True
             st.rerun()
         else:
