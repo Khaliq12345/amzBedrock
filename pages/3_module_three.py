@@ -7,14 +7,14 @@ from streamlit_extras.colored_header import colored_header
 buffer = io.BytesIO()
 
 st.set_page_config(
-    page_title="AMZ Module 3",
+    page_title="Module 3 - SP ASIN PT",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 colored_header(
-    label='Module 3',
+    label='SP ASIN PT',
     color_name= 'red-70'
 )
 
@@ -22,7 +22,6 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 
 def module_3():
-    st.header('Bulk Data Processor - Module 3', divider='rainbow')
     output_dataframe = pd.DataFrame()
 
     with st.form('form-1', border=True):
