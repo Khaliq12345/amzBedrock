@@ -22,6 +22,10 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 if 'module_name' not in st.session_state:
     st.session_state['module_name'] = None
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
+if 'date' not in st.session_state:
+    st.session_state['date'] = None
 
 st.session_state['module_name'] = 'SP Category PT'
 
@@ -50,7 +54,6 @@ def module_4():
             file_name=f"Output_{st.session_state['module_name']}_{st.session_state['username']}_{st.session_state['date']}.xlsx",
             mime="application/vnd.ms-excel"
         )
-        st.write(st.session_state['username'])
 
 if st.session_state['access']:
     module_4()

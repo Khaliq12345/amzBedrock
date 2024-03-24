@@ -22,6 +22,10 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 if 'module_name' not in st.session_state:
     st.session_state['module_name'] = None
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
+if 'date' not in st.session_state:
+    st.session_state['date'] = None
 
 st.session_state['module_name'] = 'SP AUTO'
 
