@@ -38,7 +38,8 @@ def module_5():
             if data_file is not None:
                 input_df = pd.read_excel(data_file).dropna(how='all')
                 st.table(input_df.head())
-                output_dataframe = module_five.proccess_df(input_df)
+                with st.spinner('Processing file...'):
+                    output_dataframe = module_five.proccess_df(input_df)
         st.form_submit_button('Start Processing')
 
     if not output_dataframe.empty:
