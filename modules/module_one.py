@@ -66,6 +66,7 @@ def parse_date(date_str):
 
 def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
+    input_df = input_df.loc[2:]
     dfs = []
     input_df['Placement Top'] = input_df['Placement Top'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
     input_df['Placement Product Page'] = input_df['Placement Product Page'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)

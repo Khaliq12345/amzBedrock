@@ -136,6 +136,7 @@ def common_df_processor(x_table, campaign_name, row):
 
 def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
+    input_df = input_df.loc[2:]
     dfs = []
     input_df['Portfolio ID'] = input_df['Portfolio ID'].astype(str)
     for i, row in input_df.iterrows():
