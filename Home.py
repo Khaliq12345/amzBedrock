@@ -128,7 +128,6 @@ def access_app():
     )
     
     st.success('Logged In!')
-    st.write(st.session_state['json'])
     st.write("""Use the sidebar to select the modules""")
 
     if st.button('Logout!'):
