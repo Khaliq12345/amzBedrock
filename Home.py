@@ -28,8 +28,12 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 if 'cred' not in st.session_state:
     st.session_state['cred'] = credentials.Certificate(cred_json)
-if 'username' not in st.session_state:
-    st.session_state['username'] = None
+    try:
+        firebase_admin.initialize_app(st.session_state['cred'])
+    except:
+        pass
+if 'email' not in st.session_state:
+    st.session_state['email'] = None
 if 'date' not in st.session_state:
     st.session_state['date'] = None
 
@@ -44,7 +48,6 @@ st.session_state['date'] = f'{day}_{month}_{year}'
 # pswd = 'admin12345'
 
 def create_new_user(email, pswd, username):
-    firebase_admin.initialize_app(st.session_state['cred'])
     auth.create_user(email=email, password=pswd, uid=username)
     
     try:
@@ -53,9 +56,9 @@ def create_new_user(email, pswd, username):
     except auth.UserNotFoundError:
         return False
     
-def sign_in_with_username_and_password(username: str, password: str, return_secure_token: bool = True):
+def sign_in_with_username_and_password(email: str, password: str, return_secure_token: bool = True):
     payload = json.dumps({
-        "email": f'{username}@gmail.com',
+        "email": email,
         "password": password,
         "returnSecureToken": return_secure_token
     })
@@ -81,18 +84,31 @@ def login_app():
         color_name= 'blue-green-70'
     )
     
-    st.session_state['username'] = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    
-    if st.button("Login"):
-        with st.spinner('Signing in...'):
-            signed_in = sign_in_with_username_and_password(st.session_state['username'], password)
-        if signed_in:
-            st.success("Logged in as {}".format(st.session_state['username']))
-            st.session_state['access'] = True
-            st.rerun()
-        else:
-            st.error("Invalid username or password")
+    login_tab, signup_tab = st.tabs(["Login", 'Signup'])
+    with login_tab:
+        with st.form('log-in', clear_on_submit=True, border=True):
+            st.session_state['email'] = st.text_input("Email", key='login-in-email')
+            password = st.text_input("Password", type="password", key='pwsd-username')
+            submitted = st.form_submit_button("Log In")
+            if submitted:
+                with st.spinner('Signing in...'):
+                    signed_in = sign_in_with_username_and_password(st.session_state['email'], password)
+                if signed_in:
+                    st.success("Logged in as {}".format(st.session_state['email']))
+                    st.session_state['access'] = True
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password. Kindly sign up before logging in")
+    with signup_tab:
+        with st.form('sign-up', clear_on_submit=True, border=True):
+            email = st.text_input('Email', key='sign-up-email')
+            username = st.text_input("Username", key='sign-up-username')
+            password = st.text_input("Password", type="password", key='sign-up-pswd')
+            submitted = st.form_submit_button("Sign Up")
+            if submitted:
+                if create_new_user(email, password, username):
+                    st.success('Account created!')
+                    st.info('Go to the login tab to login')
 
 def access_app():
     st.set_page_config(

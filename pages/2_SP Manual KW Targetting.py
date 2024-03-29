@@ -22,8 +22,8 @@ if 'access' not in st.session_state:
     st.session_state['access'] = False
 if 'module_name' not in st.session_state:
     st.session_state['module_name'] = None
-if 'username' not in st.session_state:
-    st.session_state['username'] = None
+if 'email' not in st.session_state:
+    st.session_state['email'] = None
 if 'date' not in st.session_state:
     st.session_state['date'] = None
 
@@ -48,10 +48,11 @@ def module_2():
         writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
         output_dataframe.to_excel(writer, sheet_name='Sheet1', index=False)
         writer.close()
+        file_name = st.session_state['email'].split('@')[0]
         st.download_button(
             label="Download Output",
             data=buffer,
-            file_name=f"Output_{st.session_state['module_name']}_{st.session_state['username']}_{st.session_state['date']}.xlsx",
+            file_name=f"Output_{st.session_state['module_name']}_{file_name}_{st.session_state['date']}.xlsx",
             mime="application/vnd.ms-excel"
         )
 
