@@ -26,6 +26,8 @@ if 'email' not in st.session_state:
     st.session_state['email'] = None
 if 'date' not in st.session_state:
     st.session_state['date'] = None
+if 'username' not in st.session_state:
+    st.session_state['username'] = None
 
 st.session_state['module_name'] = 'SD Product DP'
 
@@ -48,7 +50,7 @@ def module_5():
         writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
         output_dataframe.to_excel(writer, sheet_name='Sheet1', index=False)
         writer.close()
-        file_name = st.session_state['email'].split('@')[0]
+        file_name = st.session_state['username']
         st.download_button(
             label="Download Output",
             data=buffer,
