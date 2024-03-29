@@ -66,6 +66,7 @@ def sign_in_with_username_and_password(email: str, password: str, return_secure_
     r = requests.post(rest_api_url,
                       params={"key": st.secrets['FIREBASE_WEB_API_KEY']},
                       data=payload)
+    st.write(r.json())
     if r.status_code == 200:
       return True
     else:
