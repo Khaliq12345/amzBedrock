@@ -4,6 +4,8 @@ import pandas
 from datetime import datetime
 import gdown
 from warnings import filterwarnings
+import uuid
+import os
 
 filterwarnings('ignore')
 
@@ -71,12 +73,12 @@ def parse_date(date_str):
     return f'{year}{month}{day}'
 
 def download_asins(file_url):
-    output = "target.txt"
+    x_name = str(uuid.uuid1())
+    output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
-    with open('target.txt', 'r') as f:
-        asins = f.readlines()
-        asins = [a.replace('\n', '') for a in asins]
-    return asins
+    df = pd.read_csv(output, header=None)
+    os.remove(output)
+    return df[0].to_list()
 
 def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')

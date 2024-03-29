@@ -4,6 +4,8 @@ import pandas
 from datetime import datetime
 import gdown
 from warnings import filterwarnings
+import uuid
+import os
 
 filterwarnings('ignore')
 
@@ -86,12 +88,12 @@ def get_table(cols: list, keyword_type: str, keywords: list):
 
 # a file
 def download_keywords(file_url):
-    output = "kw.txt"
+    x_name = str(uuid.uuid1())
+    output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
-    with open('kw.txt', 'r') as f:
-        kws = f.readlines()
-        kws = [k.replace('\n', '') for k in kws]
-    return kws
+    df = pd.read_csv(f'{x_name}.csv', header=None)
+    os.remove(f'{x_name}.csv')
+    return df[0].to_list()
 
 def modify_table(row, x_table, kw_type, kws):
     #Generating the campaign name
