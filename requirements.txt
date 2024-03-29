@@ -1,4 +1,4 @@
-gdown == "5.1.0"
+gdown == "5.0.1"
 pandas == "2.2.1"
 streamlit == "1.32.2"
 streamlit-extras == "0.4.0"
