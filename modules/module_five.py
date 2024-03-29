@@ -237,7 +237,7 @@ def proccess_df(input_df: pd.DataFrame):
                 tev = f"purchases-related-product lookback-{row['Lookback']}"
             x_table.loc[x_table['Entity'] == 'Audience Targeting', 'Targeting Expression'] = targeting_exp_value
             #campaign name
-            cost_type = cost_type_selector(row['Bid Optimization'])
+            cost_type = cost_type_selector_campaign_name(row['Bid Optimization'])
             campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{tev}_Retargeting"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00030'
             x_table = common_df_processor(x_table, campaign_name, row)
