@@ -36,6 +36,8 @@ if 'email' not in st.session_state:
     st.session_state['email'] = None
 if 'date' not in st.session_state:
     st.session_state['date'] = None
+if 'json' not in st.session_state:
+    st.session_state['json'] = None
 
 add_zero_if_one = lambda x: f'0{x}' if len(x) == 1 else x
 date_obj = datetime.now()
@@ -66,7 +68,7 @@ def sign_in_with_username_and_password(email: str, password: str, return_secure_
     r = requests.post(rest_api_url,
                       params={"key": st.secrets['FIREBASE_WEB_API_KEY']},
                       data=payload)
-    st.write(r.json())
+    st.session_state['json'] = r.json()
     if r.status_code == 200:
       return True
     else:
@@ -126,7 +128,7 @@ def access_app():
     )
     
     st.success('Logged In!')
-
+    st.write(st.session_state['json'])
     st.write("""Use the sidebar to select the modules""")
 
     if st.button('Logout!'):
