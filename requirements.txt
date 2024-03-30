@@ -7,3 +7,4 @@ openpyxl
 xlsxwriter
 firebase-admin
 requests
+retrying

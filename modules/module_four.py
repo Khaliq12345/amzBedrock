@@ -6,6 +6,7 @@ import gdown
 from warnings import filterwarnings
 import uuid
 import os
+from retrying import retry
 
 
 filterwarnings('ignore')
@@ -74,6 +75,7 @@ def parse_date(date_str):
     day = adder(str(parse_date.day))
     return f'{year}{month}{day}'
 
+@retry(stop_max_attempt_number=10, wait_fixed=500)
 def download_categories(file_url):
     x_name = str(uuid.uuid1())
     output = f"{x_name}.csv"

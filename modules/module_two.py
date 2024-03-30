@@ -6,6 +6,7 @@ import gdown
 from warnings import filterwarnings
 import uuid
 import os
+from retrying import retry
 
 filterwarnings('ignore')
 
@@ -87,6 +88,7 @@ def get_table(cols: list, keyword_type: str, keywords: list):
     return df
 
 # a file
+@retry(stop_max_attempt_number=10, wait_fixed=500)
 def download_keywords(file_url):
     x_name = str(uuid.uuid1())
     output = f"{x_name}.csv"

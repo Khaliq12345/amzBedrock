@@ -6,6 +6,7 @@ import gdown
 from warnings import filterwarnings
 import uuid
 import os
+from retrying import retry
 
 filterwarnings('ignore')
 
@@ -75,6 +76,7 @@ def get_table(cols: list, target_type:str, targets:list, asin=False):
     df = pd.DataFrame(items, columns=cols)
     return df
 
+@retry(stop_max_attempt_number=10, wait_fixed=500)
 def get_targets(file_url, type_):
     x_name = str(uuid.uuid1())
     output = f"{x_name}.csv"
