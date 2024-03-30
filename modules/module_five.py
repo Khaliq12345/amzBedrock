@@ -148,13 +148,14 @@ def proccess_df(input_df: pd.DataFrame):
             x_table = get_table(out_cols, 'Contextual Targeting', targets, asin=True)
             x_table['Operation'] = 'create'
             #cost type
-            cost_type_selector = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+            cost_type_campagin = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+            cost_type_selector =  lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
             #targeting expression
             targeting_exp_values = [f'asin="{t}"' for t in targets]
             x_table.loc[x_table['Entity'] == 'Contextual Targeting', 'Targeting Expression'] = targeting_exp_values
             #campaign name
-            cost_type = cost_type_selector(row['Bid Optimization'])
+            cost_type = cost_type_campagin(row['Bid Optimization'])
             if row['Defense'] == 'yes':
                 campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_ASIN Targeting_Defense"
             else:
@@ -170,13 +171,14 @@ def proccess_df(input_df: pd.DataFrame):
                 x_table = get_table(out_cols, 'Contextual Targeting', [], asin=False)
                 x_table['Operation'] = 'create'
                 #cost type
-                cost_type_selector = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+                cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+                cost_type_selector = lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
                 #targeting expression
                 targeting_exp_value = f'category="{cat}"'
                 x_table.loc[x_table['Entity'] == 'Contextual Targeting', 'Targeting Expression'] = targeting_exp_value
                 #campaign name
-                cost_type = cost_type_selector(row['Bid Optimization'])
+                cost_type = cost_type_campaign(row['Bid Optimization'])
                 if row['Defense'] == 'yes':
                     campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{cat_name}_Defense"
                 else:
@@ -192,20 +194,21 @@ def proccess_df(input_df: pd.DataFrame):
                 x_table = get_table(out_cols, 'Audience Targeting', [], asin=False)
                 x_table['Operation'] = 'create'
                 #cost type
-                cost_type_selector = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+                cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+                cost_type_selector = lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
                 #targeting expression
                 if 'views-Category' in row['Audience Targeting']:
-                    targeting_exp_value = f'views=(category="{cat}" lookback={row["Lookback"].replace("days", "")})'
+                    targeting_exp_value = f'views=(category="{cat}" lookback={row["Lookback"].replace(" days", "")})'
                     tev = f"views-category-{cat_name}-lookback-{row['Lookback']}"
                 elif 'purchases-Category' in row['Audience Targeting']:
-                    targeting_exp_value = f'purchases=(category="{cat}" lookback={row["Lookback"].replace("days", "")})'
+                    targeting_exp_value = f'purchases=(category="{cat}" lookback={row["Lookback"].replace(" days", "")})'
                     tev = f"purchases-category-{cat_name}-lookback-{row['Lookback']}"
                 else:
                     targeting_exp_value = None
                 x_table.loc[x_table['Entity'] == 'Audience Targeting', 'Targeting Expression'] = targeting_exp_value
                 #campaign name
-                cost_type = cost_type_selector(row['Bid Optimization'])
+                cost_type = cost_type_campaign(row['Bid Optimization'])
                 campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{tev}_Retargeting"
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00030'
                 x_table = common_df_processor(x_table, campaign_name, row)
@@ -216,24 +219,25 @@ def proccess_df(input_df: pd.DataFrame):
             x_table = get_table(out_cols, 'Audience Targeting', [], asin=False)
             x_table['Operation'] = 'create'
             #cost type
-            cost_type_selector = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+            cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
+            cost_type_selector =  lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
             #targeting expression
             if 'views-Advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"views=(exact-product lookback={row['Lookback'].replace('days', '')})"
+                targeting_exp_value = f"views=(exact-product lookback={row['Lookback'].replace(' days', '')})"
                 tev = f"views-exact-product lookback-{row['Lookback']})"
             elif 'views-Related to advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"views=(similar-product lookback={row['Lookback'].replace('days', '')})"
+                targeting_exp_value = f"views=(similar-product lookback={row['Lookback'].replace(' days', '')})"
                 tev = f"views-similar-product lookback-{row['Lookback']})"
             elif 'purchases-Advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"purchases=(exact-product lookback={row['Lookback'].replace('days', '')})"
+                targeting_exp_value = f"purchases=(exact-product lookback={row['Lookback'].replace(' days', '')})"
                 tev = f"purchases-exact-product lookback-{row['Lookback']})"
             elif 'purchases-Related to advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"purchases=(related-product lookback={row['Lookback'].replace('days', '')})"
+                targeting_exp_value = f"purchases=(related-product lookback={row['Lookback'].replace(' days', '')})"
                 tev = f"purchases-related-product lookback-{row['Lookback']})"
             x_table.loc[x_table['Entity'] == 'Audience Targeting', 'Targeting Expression'] = targeting_exp_value
             #campaign name
-            cost_type = cost_type_selector(row['Bid Optimization'])
+            cost_type = cost_type_campagin(row['Bid Optimization'])
             campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{tev}_Retargeting"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00030'
             x_table = common_df_processor(x_table, campaign_name, row)
