@@ -199,10 +199,10 @@ def proccess_df(input_df: pd.DataFrame):
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
                 #targeting expression
                 if 'views-Category' in row['Audience Targeting']:
-                    targeting_exp_value = f'views=(category="{cat}" lookback={row["Lookback"].replace(" days", "")})'
+                    targeting_exp_value = f'views=(category="{cat}" lookback={row["Lookback"].replace(" days", "").strip()})'
                     tev = f"views-category-{cat_name}-lookback-{row['Lookback']}"
                 elif 'purchases-Category' in row['Audience Targeting']:
-                    targeting_exp_value = f'purchases=(category="{cat}" lookback={row["Lookback"].replace(" days", "")})'
+                    targeting_exp_value = f'purchases=(category="{cat}" lookback={row["Lookback"].replace(" days", "").strip()})'
                     tev = f"purchases-category-{cat_name}-lookback-{row['Lookback']}"
                 else:
                     targeting_exp_value = None
@@ -224,16 +224,16 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'] == 'Campaign', 'Cost Type'] = cost_type_selector(row['Bid Optimization'])
             #targeting expression
             if 'views-Advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"views=(exact-product lookback={row['Lookback'].replace(' days', '')})"
+                targeting_exp_value = f"views=(exact-product lookback={row['Lookback'].replace(' days', '').strip()})"
                 tev = f"views-exact-product lookback-{row['Lookback']})"
             elif 'views-Related to advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"views=(similar-product lookback={row['Lookback'].replace(' days', '')})"
+                targeting_exp_value = f"views=(similar-product lookback={row['Lookback'].replace(' days', '').strip()})"
                 tev = f"views-similar-product lookback-{row['Lookback']})"
             elif 'purchases-Advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"purchases=(exact-product lookback={row['Lookback'].replace(' days', '')})"
+                targeting_exp_value = f"purchases=(exact-product lookback={row['Lookback'].replace(' days', '').strip()})"
                 tev = f"purchases-exact-product lookback-{row['Lookback']})"
             elif 'purchases-Related to advertised products' in row['Audience Targeting']:
-                targeting_exp_value = f"purchases=(related-product lookback={row['Lookback'].replace(' days', '')})"
+                targeting_exp_value = f"purchases=(related-product lookback={row['Lookback'].replace(' days', '').strip()})"
                 tev = f"purchases-related-product lookback-{row['Lookback']})"
             x_table.loc[x_table['Entity'] == 'Audience Targeting', 'Targeting Expression'] = targeting_exp_value
             #campaign name
