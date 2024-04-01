@@ -227,16 +227,16 @@ def proccess_df(input_df: pd.DataFrame):
             #targeting expression
             if 'views-Advertised products' in row['Audience Targeting']:
                 targeting_exp_value = f"views=(exact-product lookback={row['Lookback'].replace(' days', '').strip()})"
-                tev = f"views-exact-product lookback-{row['Lookback']}"
+                tev = f"views-exact-product lookback-{row['Lookback']})"
             elif 'views-Related to advertised products' in row['Audience Targeting']:
                 targeting_exp_value = f"views=(similar-product lookback={row['Lookback'].replace(' days', '').strip()})"
-                tev = f"views-similar-product lookback-{row['Lookback']}"
+                tev = f"views-similar-product lookback-{row['Lookback']})"
             elif 'purchases-Advertised products' in row['Audience Targeting']:
                 targeting_exp_value = f"purchases=(exact-product lookback={row['Lookback'].replace(' days', '').strip()})"
-                tev = f"purchases-exact-product lookback-{row['Lookback']}"
+                tev = f"purchases-exact-product lookback-{row['Lookback']})"
             elif 'purchases-Related to advertised products' in row['Audience Targeting']:
                 targeting_exp_value = f"purchases=(related-product lookback={row['Lookback'].replace(' days', '').strip()})"
-                tev = f"purchases-related-product lookback-{row['Lookback']}"
+                tev = f"purchases-related-product lookback-{row['Lookback']})"
             x_table.loc[x_table['Entity'] == 'Audience Targeting', 'Targeting Expression'] = targeting_exp_value
             #campaign name
             cost_type = cost_type_campagin(row['Bid Optimization'])
