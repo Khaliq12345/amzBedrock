@@ -102,16 +102,16 @@ def login_app():
                     st.rerun()
                 else:
                     st.error("Invalid username or password. Kindly sign up before logging in")
-    with signup_tab:
-        with st.form('sign-up', clear_on_submit=True, border=True):
-            email = st.text_input('Email', key='sign-up-email')
-            username = st.text_input("Username", key='sign-up-username')
-            password = st.text_input("Password", type="password", key='sign-up-pswd')
-            submitted = st.form_submit_button("Sign Up")
-            if submitted:
-                if create_new_user(email, password, username):
-                    st.success('Account created!')
-                    st.info('Go to the login tab to login')
+    # with signup_tab:
+    #     with st.form('sign-up', clear_on_submit=True, border=True):
+    #         email = st.text_input('Email', key='sign-up-email')
+    #         username = st.text_input("Username", key='sign-up-username')
+    #         password = st.text_input("Password", type="password", key='sign-up-pswd')
+    #         submitted = st.form_submit_button("Sign Up")
+    #         if submitted:
+    #             if create_new_user(email, password, username):
+    #                 st.success('Account created!')
+    #                 st.info('Go to the login tab to login')
 
 def access_app():
     st.set_page_config(
