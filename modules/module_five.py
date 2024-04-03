@@ -83,11 +83,13 @@ def get_targets(file_url, type_):
     if type_ == 'list':
         gdown.download(file_url, output, fuzzy=True, quiet=True)
         df = pd.read_csv(output, header=None)
+        df.dropna(how='all')
         os.remove(output)
         return df[0].to_list()
     elif type_ == 'df':
         gdown.download(file_url, output, fuzzy=True, quiet=True)
         df = pd.read_csv(output, header=None)
+        df.dropna(how='all')
         os.remove(output)
         return df[0].to_list(), df[1].to_list()
     else:

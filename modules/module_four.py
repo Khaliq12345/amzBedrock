@@ -81,6 +81,7 @@ def download_categories(file_url):
     output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
     df = pd.read_csv(output, header=None)
+    df.dropna(how='all')
     os.remove(output)
     return df
 
