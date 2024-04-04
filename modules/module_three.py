@@ -79,7 +79,7 @@ def download_asins(file_url):
     output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
     df = pd.read_csv(output, header=None)
-    df.dropna(how='all')
+    df.dropna(how='all', inplace=True)
     os.remove(output)
     return df[0].to_list()
 

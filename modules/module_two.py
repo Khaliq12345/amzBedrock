@@ -94,7 +94,7 @@ def download_keywords(file_url):
     output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
     df = pd.read_csv(f'{x_name}.csv', header=None)
-    df.dropna(how='all')
+    df.dropna(how='all', inplace=True)
     os.remove(f'{x_name}.csv')
     return df[0].to_list()
 
