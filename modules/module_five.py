@@ -91,6 +91,7 @@ def get_targets(file_url, type_):
         df = pd.read_csv(output, header=None)
         df.dropna(how='all', inplace=True)
         os.remove(output)
+        df = df.convert_dtypes()
         return df[0].to_list(), df[1].to_list()
     else:
         print('Please check your type: The only supported types are list and df')
