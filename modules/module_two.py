@@ -164,7 +164,7 @@ def modify_table(row, x_table, kw_type, kws):
     x_table.loc[x_table['Entity'] == 'Keyword', 'Match Type'] = row['Match Type']
     
     #bidding strategy
-    x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = 'Dynamic bids - down only'
+    x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = row['Bidding Strategy']
     
     #Placement
     placement_values = ['Placement Product Page', 

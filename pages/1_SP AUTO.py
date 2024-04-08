@@ -28,18 +28,11 @@ if 'date' not in st.session_state:
     st.session_state['date'] = None
 if 'username' not in st.session_state:
     st.session_state['username'] = None
-if 'bidding_strategy' not in st.session_state:
-    st.session_state['bidding_strategy'] = 'Dynamic bids - down only'
 
 st.session_state['module_name'] = 'SP AUTO'
 
 def module_1():
     output_dataframe = pd.DataFrame()
-
-    st.session_state['bidding_strategy'] = st.selectbox(
-        'Choose your Bidding Strategy type',
-        ('Dynamic bids - up and down', 'Dynamic bids - down only', 'Fixed bids')
-    )
 
     with st.form('form-1', border=True):
         data_file = st.file_uploader('Upload your excel data', type=['xlsx'])
@@ -47,7 +40,7 @@ def module_1():
             if data_file is not None:
                 input_df = pd.read_excel(data_file).dropna(how='all')
                 st.table(input_df.head())
-                output_dataframe = module_one.proccess_df(input_df, bidding_strategy=st.session_state['bidding_strategy'])
+                output_dataframe = module_one.proccess_df(input_df)
         st.form_submit_button('Start Processing')
 
     if not output_dataframe.empty:

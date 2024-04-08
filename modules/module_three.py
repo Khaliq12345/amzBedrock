@@ -131,7 +131,7 @@ def proccess_df(input_df: pd.DataFrame):
             #Ad group default bid
             x_table.loc[x_table['Entity'] == 'Ad Group', 'Ad Group Default Bid'] = row['Bid']
             #Bidding adj
-            x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = 'Dynamic bids - down only'
+            x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = row['Bidding Strategy']
             #Placement
             placement_values = ['Placement Product Page', 
                                 'Placement Rest Of Search', 
