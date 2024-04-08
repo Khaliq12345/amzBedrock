@@ -64,7 +64,7 @@ def parse_date(date_str):
     day = adder(str(parse_date.day))
     return f'{year}{month}{day}'
 
-def proccess_df(input_df: pd.DataFrame):
+def proccess_df(input_df: pd.DataFrame, bidding_strategy: str):
     input_df.dropna(how='all')
     input_df = input_df.loc[2:]
     dfs = []
@@ -94,7 +94,7 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'] == 'Product Ad', 'SKU'] = console_sc_vc(row['Console'], row['SKU'], 'SC')
             x_table.loc[x_table['Entity'] == 'Product Ad', 'ASIN'] = console_sc_vc(row['Console'], row['ASIN'], 'VC')
             x_table.loc[x_table['Entity'] == 'Ad Group', 'Ad Group Default Bid'] = row['Bid']
-            x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = 'Dynamic bids - down only'
+            x_table.loc[x_table['Entity'].isin(['Campaign', 'Bidding Adjustment']), 'Bidding Strategy'] = bidding_strategy
             #Placement
             placement_values = ['Placement Product Page', 
                                 'Placement Rest Of Search', 
