@@ -31,17 +31,34 @@ if 'username' not in st.session_state:
 
 st.session_state['module_name'] = 'SD Product DP'
 
-def module_5():
-    output_dataframe = pd.DataFrame()
+def show_input(data_file):
+    with st.expander('Look at what your Input data looks like'):
+        if data_file is not None:
+            input_df = pd.read_excel(data_file).dropna(how='all')
+            st.table(input_df.head())
 
-    with st.form('form-1', border=True):
+def processing_input_file(data_file):
+    output_dataframe = pd.DataFrame()
+    if data_file is not None:
+        input_df = pd.read_excel(data_file).dropna(how='all')
+        try:
+            output_dataframe = module_five.proccess_df(input_df)
+        except Exception as e:
+            st.error('Error parsing the input file. Kindly try again or contact the support')
+            st.info(e)
+    return output_dataframe
+
+def module_5():
+    with st.container(border=True):
+        output_dataframe = pd.DataFrame()
         data_file = st.file_uploader('Upload your excel data', type=['xlsx'])
-        with st.expander('Look at what your Input data looks like'):
-            if data_file is not None:
-                input_df = pd.read_excel(data_file).dropna(how='all')
-                st.table(input_df.head())
-                output_dataframe = module_five.proccess_df(input_df)
-        st.form_submit_button('Start Processing')
+        col1, col2 = st.columns(2)
+        show_input_button = col1.button('Show preview of the input data')
+        if show_input_button:
+            show_input(data_file)
+        form_button = col2.button('Start Processing')
+        if form_button:
+            output_dataframe = processing_input_file(data_file)
 
     if not output_dataframe.empty:
         with st.expander('Look at what your Output data looks like'):

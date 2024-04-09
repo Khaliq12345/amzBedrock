@@ -1,6 +1,9 @@
 import pandas as pd
 import dateparser
 from datetime import datetime
+import uuid
+import gdown
+import os
 
 out_cols = ['Product',
  'Entity',
@@ -28,6 +31,30 @@ out_cols = ['Product',
  'Placement',
  'Percentage',
  'Product Targeting Expression']
+
+
+def get_negatives(file_url):
+    x_name = str(uuid.uuid1())
+    output = f"{x_name}.csv"
+    gdown.download(file_url, output, fuzzy=True, quiet=True)
+    df = pd.read_csv(output, header=None)
+    df.dropna(how='all', inplace=True)
+    os.remove(output)
+    df = df.convert_dtypes()
+    return df[0].to_list(), df[1].to_list()
+
+def get_negative_table(row, campaign_name):
+    x_tables = []
+    if type(row['Negative Targeting']) == str:
+        keywords, types = get_negatives(row['Negative Targeting'])
+        for keyword, type_ in zip(keywords, types):
+            x_table = get_table(out_cols)
+            x_table['Campaign ID'] = campaign_name
+            x_table['State'] = 'enabled'
+            x_table['Keyword Text'] = keyword
+            x_table['Match Type'] = type_
+            x_tables.append(x_table)
+    return x_tables
 
 def get_table(cols: list):
     items = []
@@ -110,6 +137,9 @@ def proccess_df(input_df: pd.DataFrame):
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
             dfs.append(x_table)
+            x_tables = get_negative_table(row, campaign_name)
+            for xt in x_tables:
+                dfs.append(xt)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)
     return output_dataframe
