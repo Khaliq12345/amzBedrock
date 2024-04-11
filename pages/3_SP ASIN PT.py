@@ -17,6 +17,8 @@ colored_header(
     label='SP ASIN PT',
     color_name= 'red-70'
 )
+LINK_ID = '1TTzmwVzVmHpxSxqekWlBGZ_2UQYXysJa'
+st.link_button('Download template file', url=f'https://docs.google.com/uc?export=download&id={LINK_ID}')
 
 if 'access' not in st.session_state:
     st.session_state['access'] = False

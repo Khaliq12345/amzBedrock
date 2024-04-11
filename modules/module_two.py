@@ -37,7 +37,7 @@ out_cols = ['Product',
  'Percentage',
  'Product Targeting Expression']
 
-def get_table(cols: list, keyword_type: str, keywords: list):
+def get_table(cols: list, keyword_type: str, keywords: list, neg_keywords: list = []):
     items = []
     if keyword_type == 'Single':
         items.append({
@@ -84,21 +84,31 @@ def get_table(cols: list, keyword_type: str, keywords: list):
                 'Product': "Sponsored Products",
                 'Entity': 'Keyword', 
             })
+    
+    for _ in neg_keywords:
+        items.append({
+            'Product': "Sponsored Products",
+            'Entity': 'Negative Keyword', 
+        })
     df = pd.DataFrame(items, columns=cols)
+    df = df.loc[:, :].astype(str)
     return df
 
 # a file
 @retry(stop_max_attempt_number=10, wait_fixed=500)
-def download_keywords(file_url):
+def download_keywords(file_url, is_neg: bool = False):
     x_name = str(uuid.uuid1())
     output = f"{x_name}.csv"
     gdown.download(file_url, output, fuzzy=True, quiet=True)
     df = pd.read_csv(f'{x_name}.csv', header=None)
     df.dropna(how='all', inplace=True)
     os.remove(f'{x_name}.csv')
-    return df[0].to_list()
+    if is_neg:
+        return df[0].to_list(), df[1].to_list()
+    else:
+        return df[0].to_list()
 
-def modify_table(row, x_table, kw_type, kws):
+def modify_table(row, x_table, kw_type, kws, neg_info: list = []):
     #Generating the campaign name
     no_nan = lambda x: '' if type(x) != str else x
     branded_or_name = lambda x: '_Branded_' if row['Branded Campaign?'] == 'y' else f'_{x}_'
@@ -109,10 +119,10 @@ def modify_table(row, x_table, kw_type, kws):
     campaign_name = make_campaign_name(row['Single/Group KWs'])
     
     #operation
-    x_table['Operation'] = 'create'
+    x_table.loc[:, 'Operation'] = 'create'
     
     #campaign id
-    x_table['Campaign ID'] = campaign_name
+    x_table.loc[:, 'Campaign ID'] = campaign_name
     
     #ad group id
     x_table.loc[x_table['Entity'] != 'Campaign', 'Ad Group ID'] = campaign_name
@@ -173,13 +183,19 @@ def modify_table(row, x_table, kw_type, kws):
     x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Placement'] = placement_values
     
     #Percentage
-    perc = lambda x: x*100 if x > 0.0 else 0
+    perc = lambda x: str(x) if x > 0.0 else '0'
     perc_values = [
-        perc(row['Placement Product Page']),
-        perc(row['Placement Rest Of Search']),
-        perc(row['Placement Top'])
+        perc(int(row['Placement Product Page'])),
+        perc(int(row['Placement Rest Of Search'])),
+        perc(int(row['Placement Top']))
     ]
     x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
+    #adding negative keyword data
+    if type(row['Negative Targeting']) != float:
+        x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Campaign ID'] = campaign_name
+        x_table.loc[x_table['Entity'] == 'Negative Keyword', 'State'] = 'enabled'
+        x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Keyword text'] = neg_info[0]
+        x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Match type'] = neg_info[1]
     return x_table
 
 def parse_date(date_str):
@@ -194,23 +210,33 @@ def proccess_df(input_df: pd.DataFrame):
     input_df = input_df.dropna(how='all')
     input_df = input_df.loc[2:]
     dfs = []
-    input_df['Placement Top'] = input_df['Placement Top'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Product Page'] = input_df['Placement Product Page'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Rest Of Search'] = input_df['Placement Rest Of Search'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Portfolio ID'] = input_df['Portfolio ID'].astype(str)
+    input_df.loc[:, 'Placement Top'] = input_df['Placement Top'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Product Page'] = input_df['Placement Product Page'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Rest Of Search'] = input_df['Placement Rest Of Search'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Portfolio ID'] = input_df['Portfolio ID'].astype(str)
     for i, row in input_df.iterrows():
         if type(row['SKU']) != float:
             #get the row table
             if 'Single' in row['Single/Group KWs']:
                 kws = download_keywords(row['Keyword Link'])
                 for kw in kws:
-                    x_table = get_table(out_cols, row['Single/Group KWs'], kw)
-                    x_table = modify_table(row, x_table, 'Single', kw)
+                    if type(row['Negative Targeting']) != float:
+                        neg_keywords, neg_types = download_keywords(row['Negative Targeting'], is_neg=True)
+                        x_table = get_table(out_cols, row['Single/Group KWs'], kw, neg_keywords=neg_keywords)
+                        x_table = modify_table(row, x_table, 'Single', kw, neg_info=[neg_keywords, neg_types])
+                    else:
+                        x_table = get_table(out_cols, row['Single/Group KWs'], kw)
+                        x_table = modify_table(row, x_table, 'Single', kw)
                     dfs.append(x_table)
             else:
                 kws = download_keywords(row['Keyword Link'])
-                x_table = get_table(out_cols, row['Single/Group KWs'], kws)
-                x_table = modify_table(row, x_table, 'Group', kws)        
+                if type(row['Negative Targeting']) != float:
+                    neg_keywords, neg_types = download_keywords(row['Negative Targeting'], is_neg=True)
+                    x_table = get_table(out_cols, row['Single/Group KWs'], kws, neg_keywords=neg_keywords)
+                    x_table = modify_table(row, x_table, 'Group', kws, neg_info=[neg_keywords, neg_types])
+                else:
+                    x_table = get_table(out_cols, row['Single/Group KWs'], kws)
+                    x_table = modify_table(row, x_table, 'Group', kws)        
                 dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)

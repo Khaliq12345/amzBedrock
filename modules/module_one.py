@@ -4,6 +4,7 @@ from datetime import datetime
 import uuid
 import gdown
 import os
+from retrying import retry
 
 out_cols = ['Product',
  'Entity',
@@ -32,7 +33,7 @@ out_cols = ['Product',
  'Percentage',
  'Product Targeting Expression']
 
-
+@retry(stop_max_attempt_number=10, wait_fixed=500)
 def get_negatives(file_url):
     x_name = str(uuid.uuid1())
     output = f"{x_name}.csv"
@@ -43,20 +44,7 @@ def get_negatives(file_url):
     df = df.convert_dtypes()
     return df[0].to_list(), df[1].to_list()
 
-def get_negative_table(row, campaign_name):
-    x_tables = []
-    if type(row['Negative Targeting']) == str:
-        keywords, types = get_negatives(row['Negative Targeting'])
-        for keyword, type_ in zip(keywords, types):
-            x_table = get_table(out_cols)
-            x_table['Campaign ID'] = campaign_name
-            x_table['State'] = 'enabled'
-            x_table['Keyword Text'] = keyword
-            x_table['Match Type'] = type_
-            x_tables.append(x_table)
-    return x_tables
-
-def get_table(cols: list):
+def get_table(cols: list, neg_keywords: list = []):
     items = []
     items.append({
         'Product': "Sponsored Products",
@@ -80,7 +68,13 @@ def get_table(cols: list):
                 'Product': "Sponsored Products",
                 'Entity': "Bidding Adjustment"
             })
+    for i in neg_keywords:
+        items.append({
+            'Product': "Sponsored Products",
+            'Entity': 'Negative Keyword'
+        })
     df = pd.DataFrame(items, columns=cols)
+    df = df.astype(str)
     return df
 
 def parse_date(date_str):
@@ -95,16 +89,20 @@ def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
     input_df = input_df.loc[2:]
     dfs = []
-    input_df['Placement Top'] = input_df['Placement Top'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Product Page'] = input_df['Placement Product Page'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Rest Of Search'] = input_df['Placement Rest Of Search'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Portfolio ID'] = input_df['Portfolio ID'].astype(str)
+    input_df.loc[:, 'Placement Top'] = input_df['Placement Top'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Product Page'] = input_df['Placement Product Page'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Rest Of Search'] = input_df['Placement Rest Of Search'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Portfolio ID'] = input_df['Portfolio ID'].astype(str)
     for i, row in input_df.iterrows():
         if type(row['SKU']) != float:
-            x_table = get_table(out_cols)
+            if type(row['Negative Targeting']) != float:
+                neg_keywords, neg_types = get_negatives(row['Negative Targeting'])
+                x_table = get_table(out_cols, neg_keywords)
+            else:
+                x_table = get_table(out_cols)
             campaign_name = f"{row['SKU']}_SP_Auto_{row['ASIN']}"
-            x_table['Operation'] = 'create'
-            x_table['Campaign ID'] = campaign_name
+            x_table.loc[:, 'Operation'] = 'create'
+            x_table.loc[:, 'Campaign ID'] = campaign_name
             x_table.loc[x_table['Entity'] != 'Campaign', 'Ad Group ID'] = campaign_name
             x_table.loc[x_table['Entity'] == 'Campaign', 'Portfolio ID'] = row['Portfolio ID']
             x_table.loc[x_table['Entity'] == 'Campaign', 'Campaign Name'] = campaign_name
@@ -128,18 +126,23 @@ def proccess_df(input_df: pd.DataFrame):
                                 'Placement Top']
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Placement'] = placement_values
             #Percentage
-            perc = lambda x: x*100 if x > 0.0 else 0
+            perc = lambda x: str(x) if x > 0.0 else '0'
             perc_values = [
-                perc(row['Placement Product Page']),
-                perc(row['Placement Rest Of Search']),
-                perc(row['Placement Top'])
+                perc(int(row['Placement Product Page'])),
+                perc(int(row['Placement Rest Of Search'])),
+                perc(int(row['Placement Top']))
             ]
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
+            print(x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'])
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
+            #adding negative keyword data
+            if type(row['Negative Targeting']) != float:
+                x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Campaign ID'] = campaign_name
+                x_table.loc[x_table['Entity'] == 'Negative Keyword', 'State'] = 'enabled'
+                x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Keyword text'] = neg_keywords
+                x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Match type'] = neg_types
+                
             dfs.append(x_table)
-            x_tables = get_negative_table(row, campaign_name)
-            for xt in x_tables:
-                dfs.append(xt)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)
     return output_dataframe

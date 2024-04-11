@@ -57,12 +57,13 @@ def get_table(cols: list, asins:list):
             'Entity': 'Product Targeting'
         })
     for i in range(3):
-            items.append({
-                'Product': "Sponsored Products",
-                'Entity': "Bidding Adjustment"
-            })
+        items.append({
+            'Product': "Sponsored Products",
+            'Entity': "Bidding Adjustment"
+        })
     
     df = pd.DataFrame(items, columns=cols)
+    df = df.loc[:, :].astype(str)
     return df
 
 def parse_date(date_str):
@@ -87,10 +88,10 @@ def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
     input_df = input_df.loc[2:]
     dfs = []
-    input_df['Placement Top'] = input_df['Placement Top'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Product Page'] = input_df['Placement Product Page'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Placement Rest Of Search'] = input_df['Placement Rest Of Search'].apply(lambda x: float(x.replace('%', ''))/100 if type(x) == str else x)
-    input_df['Portfolio ID'] = input_df['Portfolio ID'].astype(str)
+    input_df.loc[:, 'Placement Top'] = input_df['Placement Top'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Product Page'] = input_df['Placement Product Page'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Placement Rest Of Search'] = input_df['Placement Rest Of Search'].astype(str).apply(lambda x: x.replace('%', '').strip() if type(x) == str else x)
+    input_df.loc[:, 'Portfolio ID'] = input_df['Portfolio ID'].astype(str)
     for i, row in input_df.iterrows():
         if type(row['SKU']) != float:
             #Entity and Sponsored Product
@@ -100,11 +101,11 @@ def proccess_df(input_df: pd.DataFrame):
                 asins = download_asins(row['Targeting File'])
                 x_table = get_table(out_cols, asins)
             #create
-            x_table['Operation'] = 'create'
+            x_table.loc[:, 'Operation'] = 'create'
             #campaign name
             campaign_name = lambda x: f"{row['SKU']}_SP_PT_{row['ASIN']}_{row['Targeting']}_Expanded" if 'y' in x else f"{row['SKU']}_SP_PT_{row['ASIN']}_{row['Targeting']}"
             #campaign id
-            x_table['Campaign ID'] = campaign_name(row['Expanded?'])
+            x_table.loc[:, 'Campaign ID'] = campaign_name(row['Expanded?'])
             #ad group id
             x_table.loc[x_table['Entity'] != 'Campaign', 'Ad Group ID'] = campaign_name(row['Expanded?'])
             #portfolio id
@@ -138,11 +139,11 @@ def proccess_df(input_df: pd.DataFrame):
                                 'Placement Top']
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Placement'] = placement_values
             #Percentage
-            perc = lambda x: x*100 if x > 0.0 else 0
+            perc = lambda x: str(x) if x > 0.0 else '0'
             perc_values = [
-                perc(row['Placement Product Page']),
-                perc(row['Placement Rest Of Search']),
-                perc(row['Placement Top'])
+                perc(int(row['Placement Product Page'])),
+                perc(int(row['Placement Rest Of Search'])),
+                perc(int(row['Placement Top']))
             ]
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
             #Product Targeting
