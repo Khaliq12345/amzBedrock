@@ -58,7 +58,8 @@ def module_5():
             show_input(data_file)
         form_button = col2.button('Start Processing')
         if form_button:
-            output_dataframe = processing_input_file(data_file)
+            with st.spinner():
+                output_dataframe = processing_input_file(data_file)
 
     if not output_dataframe.empty:
         with st.expander('Look at what your Output data looks like'):

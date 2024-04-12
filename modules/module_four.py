@@ -157,6 +157,7 @@ def proccess_df(input_df: pd.DataFrame):
                     x_table.loc[x_table['Entity'] == 'Negative product targeting', 'Ad Group ID'] = campaign_name
                     neg_kewords_asins = [f'asin="{neg}"' for neg in neg_kewords]
                     x_table.loc[x_table['Entity'] == 'Negative product targeting', 'Product Targeting Expression'] = neg_kewords_asins
+                x_table.replace('nan', value='', inplace=True)
                 dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)

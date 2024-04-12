@@ -133,7 +133,6 @@ def proccess_df(input_df: pd.DataFrame):
                 perc(int(row['Placement Top']))
             ]
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
-            print(x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'])
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
             #adding negative keyword data
             if type(row['Negative Targeting']) != float:
@@ -141,7 +140,7 @@ def proccess_df(input_df: pd.DataFrame):
                 x_table.loc[x_table['Entity'] == 'Negative Keyword', 'State'] = 'enabled'
                 x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Keyword text'] = neg_keywords
                 x_table.loc[x_table['Entity'] == 'Negative Keyword', 'Match type'] = neg_types
-                
+            x_table.replace('nan', value='', inplace=True)
             dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)

@@ -227,6 +227,7 @@ def proccess_df(input_df: pd.DataFrame):
                     else:
                         x_table = get_table(out_cols, row['Single/Group KWs'], kw)
                         x_table = modify_table(row, x_table, 'Single', kw)
+                    x_table.replace('nan', value='', inplace=True)
                     dfs.append(x_table)
             else:
                 kws = download_keywords(row['Keyword Link'])
@@ -236,7 +237,8 @@ def proccess_df(input_df: pd.DataFrame):
                     x_table = modify_table(row, x_table, 'Group', kws, neg_info=[neg_keywords, neg_types])
                 else:
                     x_table = get_table(out_cols, row['Single/Group KWs'], kws)
-                    x_table = modify_table(row, x_table, 'Group', kws)        
+                    x_table = modify_table(row, x_table, 'Group', kws)
+                x_table.replace('nan', value='', inplace=True)        
                 dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)

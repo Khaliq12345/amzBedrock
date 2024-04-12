@@ -74,6 +74,7 @@ def get_table(cols: list, target_type:str, targets:list, asin=False):
             'Entity': target_type
         })   
     df = pd.DataFrame(items, columns=cols)
+    df = df.loc[:, :].astype(str)
     return df
 
 @retry(stop_max_attempt_number=10, wait_fixed=500)
@@ -117,9 +118,9 @@ def parse_date(date_str):
     return f'{year}{month}{day}'
 
 def common_df_processor(x_table, campaign_name, row):
-    x_table['Campaign Name'] = campaign_name  
-    x_table['Campaign ID'] = campaign_name
-    x_table['Portfolio ID'] = row['Portfolio ID']
+    x_table.loc[:, 'Campaign Name'] = campaign_name  
+    x_table.loc[:, 'Campaign ID'] = campaign_name
+    x_table.loc[:, 'Portfolio ID'] = row['Portfolio ID']
     x_table.loc[x_table['Entity'] != 'Campaign', 'Ad Group ID'] = campaign_name
     x_table.loc[x_table['Entity'] == 'Ad Group', 'Ad Group Name'] = campaign_name
     #date
@@ -145,13 +146,13 @@ def proccess_df(input_df: pd.DataFrame):
     input_df.dropna(how='all')
     input_df = input_df.loc[2:]
     dfs = []
-    input_df['Portfolio ID'] = input_df['Portfolio ID'].astype(str)
+    input_df.loc[:, 'Portfolio ID'] = input_df['Portfolio ID'].astype(str)
     for i, row in input_df.iterrows():
         #option 1
         if (row['Targeting'] == 'Contextual Targeting') and (row['Contextual Targeting'] == 'asin'):
             targets = processing_targets(row)
             x_table = get_table(out_cols, 'Contextual Targeting', targets, asin=True)
-            x_table['Operation'] = 'create'
+            x_table.loc[:, 'Operation'] = 'create'
             #cost type
             cost_type_campagin = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
             cost_type_selector =  lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
@@ -167,6 +168,7 @@ def proccess_df(input_df: pd.DataFrame):
                 campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_ASIN Targeting"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00020'
             x_table = common_df_processor(x_table, campaign_name, row)
+            x_table.replace('nan', value='', inplace=True)
             dfs.append(x_table)
 
         #option 2
@@ -174,7 +176,7 @@ def proccess_df(input_df: pd.DataFrame):
             targets = processing_targets(row)
             for cat, cat_name in zip(targets[0], targets[1]):
                 x_table = get_table(out_cols, 'Contextual Targeting', [], asin=False)
-                x_table['Operation'] = 'create'
+                x_table.loc[:, 'Operation'] = 'create'
                 #cost type
                 cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
                 cost_type_selector = lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
@@ -190,6 +192,7 @@ def proccess_df(input_df: pd.DataFrame):
                     campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{cat_name}"
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00020'
                 x_table = common_df_processor(x_table, campaign_name, row)
+                x_table.replace('nan', value='', inplace=True)
                 dfs.append(x_table)
 
         # option 3
@@ -197,7 +200,7 @@ def proccess_df(input_df: pd.DataFrame):
             targets = processing_targets(row)
             for cat, cat_name in zip(targets[0], targets[1]):
                 x_table = get_table(out_cols, 'Audience Targeting', [], asin=False)
-                x_table['Operation'] = 'create'
+                x_table.loc[:, 'Operation'] = 'create'
                 #cost type
                 cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
                 cost_type_selector = lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
@@ -217,12 +220,13 @@ def proccess_df(input_df: pd.DataFrame):
                 campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{tev}_Retargeting"
                 x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00030'
                 x_table = common_df_processor(x_table, campaign_name, row)
+                x_table.replace('nan', value='', inplace=True)
                 dfs.append(x_table)
         
         #option 4
         elif (row['Targeting'] == 'Audience Targeting') and (('Category' not in row['Audience Targeting'])):
             x_table = get_table(out_cols, 'Audience Targeting', [], asin=False)
-            x_table['Operation'] = 'create'
+            x_table.loc[:, 'Operation'] = 'create'
             #cost type
             cost_type_campaign = lambda x: f"cpc_{x.split(' ')[-1]}" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else f"vcpm_{x.split(' ')[-1]}"
             cost_type_selector =  lambda x: "cpc" if (x == 'Optimize for page visits') or (x == 'Optimize for conversions') else "vcpm"
@@ -246,6 +250,7 @@ def proccess_df(input_df: pd.DataFrame):
             campaign_name = f"SD_{row['SKU']}_{row['ASIN']}_{cost_type}_{tev}_Retargeting"
             x_table.loc[x_table['Entity'] == 'Campaign', 'Tactic'] = 'T00030'
             x_table = common_df_processor(x_table, campaign_name, row)
+            x_table.replace('nan', value='', inplace=True)
             dfs.append(x_table)
 
     output_dataframe = pd.concat(dfs, ignore_index=True)

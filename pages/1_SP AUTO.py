@@ -45,11 +45,11 @@ def processing_input_file(data_file):
     output_dataframe = pd.DataFrame()
     if data_file is not None:
         input_df = pd.read_excel(data_file).dropna(how='all')
-        #try:
-        output_dataframe = module_one.proccess_df(input_df)
-        # except Exception as e:
-        #     st.error('Error parsing the input file. Kindly try again or contact the support')
-        #     st.info(e)
+        try:
+            output_dataframe = module_one.proccess_df(input_df)
+        except Exception as e:
+            st.error('Error parsing the input file. Kindly try again or contact the support')
+            st.info(e)
     return output_dataframe
 
 def module_1(): 
@@ -62,11 +62,8 @@ def module_1():
             show_input(data_file)
         form_button = col2.button('Start Processing')
         if form_button:
-            try:
+            with st.spinner():
                 output_dataframe = processing_input_file(data_file)
-            except Exception as e:
-                st.error('Error parsing the input file. Kindly try again or contact the support')
-                st.info(e)
 
     if not output_dataframe.empty:
         with st.expander('Look at what your Output data looks like'):

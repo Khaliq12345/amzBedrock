@@ -158,6 +158,7 @@ def proccess_df(input_df: pd.DataFrame):
                 else:
                     targets = [f'asin="{t}"' for t in asins]
             x_table.loc[x_table['Entity'].isin(['Product Targeting']), 'Product Targeting Expression'] = targets
+            x_table.replace('nan', value='', inplace=True)
             dfs.append(x_table)
     
     output_dataframe = pd.concat(dfs, ignore_index=True)
