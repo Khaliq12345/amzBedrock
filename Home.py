@@ -70,12 +70,12 @@ def sign_in_with_username_and_password(email: str, password: str, return_secure_
                       data=payload)
     try:
         st.session_state['username'] = r.json()['localId']
-    except:
+        if r.status_code == 200:
+            return True
+    except Exception as e:
         st.error('Password or Email not correct')
-    if r.status_code == 200:
-      return True
-    else:
-      return False
+        st.info(e)
+        return False
 
 def login_app():
     st.set_page_config(
