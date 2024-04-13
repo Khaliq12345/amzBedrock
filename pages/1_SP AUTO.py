@@ -19,7 +19,7 @@ colored_header(
 )
 #VIDEO_URL = 'https://pixabay.com/en/videos/star-long-exposure-starry-sky-sky-6962/'
 #st.video(VIDEO_URL)
-LINK_ID = '1iG_PERtZCQQQrV0w7KPW6eFPUmFGGyjp'
+LINK_ID = '1ES6uMZlwUNmxCuHiSBLPKHuGcfTrAY4f'
 st.link_button('Download template file', url=f'https://docs.google.com/uc?export=download&id={LINK_ID}')
 
 if 'access' not in st.session_state:
