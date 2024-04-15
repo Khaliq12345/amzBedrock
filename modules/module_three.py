@@ -141,9 +141,9 @@ def proccess_df(input_df: pd.DataFrame):
             #Percentage
             perc = lambda x: str(x) if x > 0.0 else '0'
             perc_values = [
-                perc(int(row['Placement Product Page'])),
-                perc(int(row['Placement Rest Of Search'])),
-                perc(int(row['Placement Top']))
+                perc(float(row['Placement Product Page'])),
+                perc(float(row['Placement Rest Of Search'])),
+                perc(float(row['Placement Top']))
             ]
             x_table.loc[x_table['Entity'] == 'Bidding Adjustment', 'Percentage'] = perc_values
             #Product Targeting
